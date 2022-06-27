@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "688471344257",
+    "firebase_url": "https://put-away-2ee36-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "put-away-2ee36",
+    "storage_bucket": "put-away-2ee36.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:688471344257:android:45572787718cc2625cf980",
+        "android_client_info": {
+          "package_name": "ch.saryve.put_away"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "688471344257-jdq9qs24sgnbrjsddam83usjmsuhhroe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ch.saryve.put_away",
+            "certificate_hash": "33a65f093201e6dc22fbc82aba2fd864c2720175"
+          }
+        },
+        {
+          "client_id": "688471344257-0m6t1bkcr8osqajoer6npehs8dgm3jc7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHQiJqoP0tmfFIAfhC6Ja-V5v6SElsgiw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "688471344257-0m6t1bkcr8osqajoer6npehs8dgm3jc7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
