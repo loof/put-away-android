@@ -10,8 +10,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -25,7 +23,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import ch.saryve.put_away.entities.Category;
 import ch.saryve.put_away.entities.Item;
 import ch.saryve.put_away.entities.Owner;
@@ -42,6 +39,7 @@ public class ItemsActivity extends AppCompatActivity {
     private Map<String, Item> items;
     private ProgressBar progressBar;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +55,9 @@ public class ItemsActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         downloadOwners();
     }
+
+
+
 
     private void downloadOwners() {
         db.collection("owners").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
