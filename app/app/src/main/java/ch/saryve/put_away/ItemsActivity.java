@@ -40,6 +40,7 @@ public class ItemsActivity extends AppCompatActivity {
     private Map<String, Owner> owners;
     private Map<String, Item> items;
     private ProgressBar progressBar;
+    private EndlessRecyclerViewScrollListener scrollListener;
 
 
     @Override
