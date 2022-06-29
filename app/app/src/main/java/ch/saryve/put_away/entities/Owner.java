@@ -1,7 +1,10 @@
 package ch.saryve.put_away.entities;
 
+import com.google.firebase.firestore.DocumentId;
+
 public class Owner {
-    private String documentId;
+
+    private String documentId; // Firestorm database document id
     private String name;
 
     public String getDocumentId() {

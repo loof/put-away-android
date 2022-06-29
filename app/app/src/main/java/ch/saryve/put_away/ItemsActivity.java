@@ -1,8 +1,5 @@
 package ch.saryve.put_away;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -10,6 +7,10 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -23,6 +24,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import ch.saryve.put_away.entities.Category;
 import ch.saryve.put_away.entities.Item;
 import ch.saryve.put_away.entities.Owner;
@@ -53,11 +55,9 @@ public class ItemsActivity extends AppCompatActivity {
         }
 
         db = FirebaseFirestore.getInstance();
+
         downloadOwners();
     }
-
-
-
 
     private void downloadOwners() {
         db.collection("owners").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -68,20 +68,18 @@ public class ItemsActivity extends AppCompatActivity {
                     QuerySnapshot querySnapshot = task.getResult();
 
                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                        Owner owners = new Owner();
-                        owners.setDocumentId(document.getId());
-                        owners.setName(document.getString("name"));
-                        ownerMap.put(owners.getDocumentId(), owners);
+                        Owner owner = document.toObject(Owner.class);
+                        owner.setDocumentId(document.getId());
+                        ownerMap.put(owner.getDocumentId(), owner);
                     }
                     ItemsActivity.this.owners = ownerMap;
                     downloadCategories();
                 } else {
-                    showErrorToast();
+                    showErrorToast("Error getting documents: " + task.getException());
                 }
             }
         });
     }
-
 
     private void downloadCategories() {
         db.collection("categories").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -92,18 +90,20 @@ public class ItemsActivity extends AppCompatActivity {
                     QuerySnapshot querySnapshot = task.getResult();
 
                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                        Category category = new Category();
-                        category.setDocumentId(document.getId());
-                        category.setName(document.getString("name"));
+                        Category category = document.toObject(Category.class);
                         categoryMap.put(category.getDocumentId(), category);
                     }
+
                     ItemsActivity.this.categories = categoryMap;
+
                     downloadItems();
                 } else {
-                    showErrorToast();
+                    showErrorToast("Error getting documents: " + task.getException());
                 }
             }
         });
+
+
     }
 
     private void downloadItems() {
@@ -113,62 +113,26 @@ public class ItemsActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     Map<String, Item> itemsMap = new HashMap<>();
                     QuerySnapshot querySnapshot = task.getResult();
+
                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                        Item item = new Item();
+                      try {
+                          Item item = document.toObject(Item.class);
+                          itemsMap.put(item.getDocumentId(), item);
+                      } catch (Exception e) {
+                          Log.d(TAG, e.getLocalizedMessage());
+                      }
 
-                        item.setDocumentId(document.getId());
 
-                        if (document.getString("title") != null) {
-                            item.setTitle(document.getString("title"));
-                        }
-
-                        if (document.getDocumentReference("category").getId() != null) {
-                            item.setCategory(categories.get(document.getDocumentReference("category").getId()));
-                        }
-
-                        if (document.getString("description") != null) {
-                            item.setDescription(document.getString("description"));
-                        }
-
-                        if (document.getGeoPoint("bought_from") != null) {
-                            item.setBoughtFrom(document.getGeoPoint("bought_from"));
-                        }
-
-                        if (document.getDate("buying_date") != null) {
-                            item.setBuyingDate(document.getDate("buying_date"));
-                        }
-
-                        if (document.getDocumentReference("owner") != null && document.getDocumentReference("owner").getId() != null) {
-                            item.setOwner(owners.get(categories.get(document.getDocumentReference("owner").getId())));
-                        }
-
-                        if (document.getDouble("price") != null) {
-                            item.setPrice(document.getDouble("price"));
-                        }
-
-                        if (document.getString("website") != null) {
-                            item.setWebsite(document.getString("website"));
-                        }
-
-                        if (document.getDouble("warranty_years") != null) {
-                            item.setWarrantyYears(document.getDouble("warranty_years"));
-                        }
-
-                        itemsMap.put(item.getDocumentId(), item);
                     }
                     ItemsActivity.this.items = itemsMap;
 
                 } else {
-                    Log.d(TAG, "Error getting documents: ", task.getException());
+                    showErrorToast("Error getting documents: " + task.getException());
                 }
             }
         });
-    }
 
-    private void showErrorToast() {
-        Toast.makeText(ItemsActivity.this, "Something went wrong", Toast.LENGTH_SHORT);
     }
-
 
     private void createItem() {
 
@@ -195,4 +159,7 @@ public class ItemsActivity extends AppCompatActivity {
                 });
     }
 
+    private void showErrorToast(String message) {
+        Toast.makeText(ItemsActivity.this, message, Toast.LENGTH_SHORT);
+    }
 }

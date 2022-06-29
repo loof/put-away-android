@@ -1,24 +1,44 @@
 package ch.saryve.put_away.entities;
 
 
-import com.google.firebase.firestore.GeoPoint;
+import androidx.recyclerview.widget.SortedList;
 
+import com.google.firebase.firestore.DocumentId;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.local.ReferenceSet;
+import com.google.j2objc.annotations.Property;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Item {
+    @DocumentId
     private String documentId; // Firestorm database document id
-    private Category category;
+    private int amount;
+    private DocumentReference category;
     private String title;
-    private Owner owner;
+    private DocumentReference owner;
     private double price;
     private Date buyingDate;
     private double warrantyYears;
     private GeoPoint boughtFrom;
     private String website;
     private String description;
+    private ArrayList<DocumentReference> items;
+    private ArrayList<String> images;
 
     public String getDocumentId() {
         return documentId;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
     }
 
     public void setDocumentId(String documentId) {
@@ -33,19 +53,35 @@ public class Item {
         this.title = title;
     }
 
-    public Category getCategory() {
+    public DocumentReference getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(DocumentReference category) {
         this.category = category;
     }
 
-    public Owner getOwner() {
+    public ArrayList<DocumentReference> getItems() {
+        return items;
+    }
+
+    public void setItems(ArrayList<DocumentReference> items) {
+        this.items = items;
+    }
+
+    public ArrayList<String> getImages() {
+        return images;
+    }
+
+    public void setImages(ArrayList<String> images) {
+        this.images = images;
+    }
+
+    public DocumentReference getOwner() {
         return owner;
     }
 
-    public void setOwner(Owner owner) {
+    public void setOwner(DocumentReference owner) {
         this.owner = owner;
     }
 

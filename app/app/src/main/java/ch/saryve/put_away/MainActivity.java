@@ -7,18 +7,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.auth.api.identity.BeginSignInRequest;
 import com.google.android.gms.auth.api.identity.BeginSignInResult;
 import com.google.android.gms.auth.api.identity.Identity;
@@ -43,11 +35,10 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private static final int RC_ONE_TAP = 9001;
-    private static final String DRIVE_REST_API_BASE_URL = "https://www.googleapis.com/drive/v3/";
-    private static final String API_KEY = "AIzaSyBHQiJqoP0tmfFIAfhC6Ja-V5v6SElsgiw";
 
     private FirebaseAuth mAuth;
     private Button btnSignIn;
+    private ProgressBar progressBar;
 
     private SignInClient oneTapClient;
     private BeginSignInRequest signInRequest;
@@ -70,14 +61,18 @@ public class MainActivity extends AppCompatActivity {
                 .setAutoSelectEnabled(true)
                 .build();
 
+        progressBar = findViewById(R.id.progressBarMainActivity);
+        progressBar.setVisibility(View.INVISIBLE);
         btnSignIn = findViewById(R.id.btnSignIn);
         mAuth = FirebaseAuth.getInstance();
 
-        //SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
-       // String idToken = sharedPreferences.getString(Constants.ID_TOKEN_KEY, null);
-       // if (idToken != null) {
-           // firebaseAuthWithGoogle(idToken);
-        //}
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+        String idToken = sharedPreferences.getString(Constants.ID_TOKEN_KEY, null);
+        if (idToken != null) {
+            btnSignIn.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+            firebaseAuthWithGoogle(idToken);
+        }
 
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,30 +99,6 @@ public class MainActivity extends AppCompatActivity {
                     myEdit.putString(Constants.ID_TOKEN_KEY, idToken);
                     myEdit.commit();
 
-                    RequestQueue queue = Volley.newRequestQueue(this);
-                    String url = String.format("%sfiles?key=%s", DRIVE_REST_API_BASE_URL, API_KEY);
-                    StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            Log.d(TAG, response);
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d(TAG, error.toString());
-                        }
-                    }){
-                        @Override
-                        public Map<String, String> getHeaders() throws AuthFailureError {
-                            Map<String, String>  params = new HashMap<>();
-                            params.put("Authorization", String.format("Bearer %s", idToken));
-                            params.put("Accept", "application/json");
-
-                            return params;
-                        }
-                    };;
-
-                    queue.add(stringRequest);
                     firebaseAuthWithGoogle(idToken);
                 }
             } catch (ApiException e) {
@@ -148,8 +119,8 @@ public class MainActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-
-                            //navigateToItemsActivity();
+                            progressBar.setVisibility(View.INVISIBLE);
+                            navigateToItemsActivity();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -164,8 +135,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(BeginSignInResult result) {
                         try {
-                            startIntentSenderForResult(
-                                    result.getPendingIntent().getIntentSender(), RC_ONE_TAP,
+                            startIntentSenderForResult(result.getPendingIntent().getIntentSender(), RC_ONE_TAP,
                                     null, 0, 0, 0);
                         } catch (IntentSender.SendIntentException e) {
                             Log.e(TAG, "Couldn't start One Tap UI: " + e.getLocalizedMessage());
